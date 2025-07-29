@@ -1,0 +1,33 @@
+name: Build & push Total‑Seg worker
+
+on:
+  push:
+    branches: [main]          # run on every commit to main
+  workflow_dispatch: {}       # …or run manually
+
+jobs:
+  build:
+    runs-on: ubuntu-latest    # GitHub’s own x86 runner
+    permissions: write-all    # lets GITHUB_TOKEN push to ghcr
+
+    steps:
+    - uses: actions/checkout@v4
+
+    # ① spin up QEMU + Buildx so we can cross‑compile
+    - uses: docker/setup-qemu-action@v3
+    - uses: docker/setup-buildx-action@v3
+
+    # ② log in to GitHub Container Registry (ghcr.io)
+    - uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    # ③ build for linux/amd64 and push—no local image emitted
+    - uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        platforms: linux/amd64
+        tags: ghcr.io/${{ github.repository_owner }}/totalseg-worker:latest
