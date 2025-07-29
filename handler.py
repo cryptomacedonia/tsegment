@@ -12,7 +12,7 @@ def handler(event):
          • nifti – base64‑encoded .nii.gz  (small cases only)
     returns: { "zipUrl": "https://…" }
     """
-    jid   = event["id"]
+    jid   = event["id"] 
     work  = tempfile.mkdtemp(prefix=jid)       # /tmp is writeable in serverless
     inp   = os.path.join(work, "input.zip")
     out_d = os.path.join(work, "seg")
